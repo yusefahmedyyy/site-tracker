@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Demo Engagement Dashboard</title>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --ink-soft: #666;
+    --line: #e5e5e5;
+    --paper: #fafafa;
+    --card: #fff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 32px;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .sub { color: var(--ink-soft); font-size: 13px; margin-bottom: 24px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
+    font-size: 14px;
+  }
+  th {
+    background: #f3f3f3;
+    font-weight: 600;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+  }
+  tr:last-child td { border-bottom: none; }
+  .empty { padding: 40px; text-align: center; color: var(--ink-soft); }
+  .err { color: #b91c1c; padding: 16px; }
+  input#key {
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 13px;
+    width: 220px;
+  }
+  button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    background: #111;
+    color: #fff;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .toolbar { display: flex; gap: 8px; margin-bottom: 20px; align-items: center; }
+</style>
+</head>
+<body>
+  <h1>Demo Engagement Dashboard</h1>
+  <div class="sub">Per-site event counts, sorted by site then event.</div>
+
+  <div class="toolbar">
+    <input id="key" type="password" placeholder="Dashboard secret" />
+    <button onclick="load()">Load</button>
+  </div>
+
+  <div id="content"></div>
+
+  <script>
+    // Pre-fill the key from the URL (?key=...) if present, and remember it locally
+    const params = new URLSearchParams(location.search);
+    const stored = params.get('key') || sessionStorage.getItem('dash_key') || '';
+    document.getElementById('key').value = stored;
+    if (stored) load();
+
+    async function load() {
+      const key = document.getElementById('key').value.trim();
+      sessionStorage.setItem('dash_key', key);
+      const content = document.getElementById('content');
+      content.innerHTML = '<div class="empty">Loading…</div>';
+      try {
+        const res = await fetch(`/api/stats?key=${encodeURIComponent(key)}`);
+        if (!res.ok) {
+          content.innerHTML = `<div class="err">Error ${res.status}: check your secret key.</div>`;
+          return;
+        }
+        const { rows } = await res.json();
+        if (!rows || rows.length === 0) {
+          content.innerHTML = '<div class="empty">No events recorded yet.</div>';
+          return;
+        }
+        const html = `
+          <table>
+            <thead>
+              <tr><th>Site</th><th>Event</th><th>Count</th><th>Last seen</th></tr>
+            </thead>
+            <tbody>
+              ${rows.map(r => `
+                <tr>
+                  <td>${escapeHtml(r.site)}</td>
+                  <td>${escapeHtml(r.event_name)}</td>
+                  <td>${r.count}</td>
+                  <td>${new Date(r.last_seen).toLocaleString()}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+        content.innerHTML = html;
+      } catch (e) {
+        content.innerHTML = `<div class="err">Request failed: ${escapeHtml(String(e))}</div>`;
+      }
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[c]));
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!--
+  Replace the existing engagement-tracking <script> block in each demo's
+  index.html with this one. Change SITE_ID per repo (e.g. "drummnonds",
+  "pidgeon-judd", "woodly", etc) and set TRACKER_URL once you know your
+  deployed tracker's domain.
+-->
+<script>
+  (function () {
+    var TRACKER_URL = 'https://YOUR-TRACKER-DOMAIN.vercel.app/api/track';
+    var SITE_ID = 'SITE_ID_HERE';
+
+    var sessionId = sessionStorage.getItem('_sid');
+    if (!sessionId) {
+      sessionId = Math.random().toString(36).slice(2) + Date.now().toString(36);
+      sessionStorage.setItem('_sid', sessionId);
+    }
+
+    function send(eventName) {
+      try {
+        fetch(TRACKER_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            site: SITE_ID,
+            event: eventName,
+            session_id: sessionId,
+            referrer: document.referrer || null,
+          }),
+          keepalive: true,
+        });
+      } catch (e) {}
+    }
+
+    send('view');
+
+    var visible = 0, last = Date.now(), fired = {};
+    var marks = [[30, 'engaged_30s'], [120, 'engaged_2min'], [300, 'engaged_5min']];
+    setInterval(function () {
+      var now = Date.now();
+      if (document.visibilityState === 'visible') visible += (now - last) / 1000;
+      last = now;
+      marks.forEach(function (m) {
+        if (visible >= m[0] && !fired[m[1]]) { fired[m[1]] = 1; send(m[1]); }
+      });
+    }, 1000);
+  })();
+</script>
