@@ -76,6 +76,7 @@
   </div>
 
   <div id="content"></div>
+  <div id="countries"></div>
 
   <script>
     // Pre-fill the key from the URL (?key=...) if present, and remember it locally
@@ -95,7 +96,7 @@
           content.innerHTML = `<div class="err">Error ${res.status}: check your secret key.</div>`;
           return;
         }
-        const { rows } = await res.json();
+              const { rows, countries } = await res.json();
         if (!rows || rows.length === 0) {
           content.innerHTML = '<div class="empty">No events recorded yet.</div>';
           return;
@@ -118,6 +119,19 @@
           </table>
         `;
         content.innerHTML = html;
+
+        var countriesEl = document.getElementById('countries');
+        if (countriesEl) {
+          if (!countries || countries.length === 0) {
+            countriesEl.innerHTML = '';
+          } else {
+    var countryHtml = '<h3>Visitors by country</h3><table><thead><tr><th>Site</th><th>Country</th><th>Count</th></tr></thead><tbody>' + countries.map(function (c) {
+      return '<tr><td>' + escapeHtml(c.site) + '</td><td>' + escapeHtml(c.country) + '</td><td>' + c.count + '</td></tr>';
+    }).join('') + '</tbody></table>';
+            countriesEl.innerHTML = countryHtml;
+          }
+        }
+        
       } catch (e) {
         content.innerHTML = `<div class="err">Request failed: ${escapeHtml(String(e))}</div>`;
       }
