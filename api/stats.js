@@ -16,7 +16,7 @@ export default async function handler(req, res) {
   try {
     const { data, error } = await supabase
       .from('events')
-      .select('site, event_name, created_at')
+              .select('site, event_name, country, created_at')
       .order('created_at', { ascending: false })
       .limit(5000);
 
@@ -43,13 +43,27 @@ export default async function handler(req, res) {
       }
     }
 
+    var countryGrouped = {};
+    for (var i = 0; i < data.length; i++) {
+      var row2 = data[i];
+      var countryKey = row2.site + '::' + (row2.country || 'Unknown');
+      if (!countryGrouped[countryKey]) {
+        countryGrouped[countryKey] = { site: row2.site, country: row2.country || 'Unknown', count: 0 };
+      }
+      countryGrouped[countryKey].count += 1;
+    }
+    var countries = Object.values(countryGrouped).sort(function (a, b) {
+      return a.site === b.site ? b.count - a.count : a.site.localeCompare(b.site);
+    });
+    
+
     const rows = Object.values(grouped).sort((a, b) =>
       a.site === b.site
         ? a.event_name.localeCompare(b.event_name)
         : a.site.localeCompare(b.site)
     );
 
-    return res.status(200).json({ rows });
+        return res.status(200).json({ rows: rows, countries: countries });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: 'Unexpected error' });
