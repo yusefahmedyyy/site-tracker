@@ -34,6 +34,7 @@ export default async function handler(req, res) {
       session_id: session_id ? String(session_id).slice(0, 100) : null,
       referrer: referrer ? String(referrer).slice(0, 300) : null,
       country: country ? String(country).slice(0, 5) : null,
+      city: city ? String(decodeURIComponent(city)).slice(0, 100) : null,
     });
 
     if (error) {
