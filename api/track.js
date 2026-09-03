@@ -22,6 +22,7 @@ export default async function handler(req, res) {
   try {
     const { site, event, session_id, referrer } = req.body || {};
     var country = req.headers['x-vercel-ip-country'] || null;
+    var city = req.headers['x-vercel-ip-city'] || null;
 
     if (!site || !event) {
       return res.status(400).json({ error: 'site and event are required' });
