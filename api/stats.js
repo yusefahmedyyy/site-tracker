@@ -16,7 +16,7 @@ export default async function handler(req, res) {
   try {
     const { data, error } = await supabase
       .from('events')
-              .select('site, event_name, country, created_at')
+              .select('site, event_name, country, city, created_at')
       .order('created_at', { ascending: false })
       .limit(5000);
 
@@ -46,10 +46,10 @@ export default async function handler(req, res) {
     var countryGrouped = {};
     for (var i = 0; i < data.length; i++) {
       var row2 = data[i];
-      var countryKey = row2.site + '::' + (row2.country || 'Unknown');
-      if (!countryGrouped[countryKey]) {
-        countryGrouped[countryKey] = { site: row2.site, country: row2.country || 'Unknown', count: 0 };
-      }
+     var countryKey = row2.site + '::' + (row2.country || 'Unknown') + '::' + (row2.city || 'Unknown');
+if (!countryGrouped[countryKey]) {
+  countryGrouped[countryKey] = { site: row2.site, country: row2.country || 'Unknown', city: row2.city || 'Unknown', count: 0 };
+}
       countryGrouped[countryKey].count += 1;
     }
     var countries = Object.values(countryGrouped).sort(function (a, b) {
