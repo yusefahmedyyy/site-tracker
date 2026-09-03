@@ -125,9 +125,9 @@
           if (!countries || countries.length === 0) {
             countriesEl.innerHTML = '';
           } else {
-    var countryHtml = '<h3>Visitors by country</h3><table><thead><tr><th>Site</th><th>Country</th><th>Count</th></tr></thead><tbody>' + countries.map(function (c) {
-      return '<tr><td>' + escapeHtml(c.site) + '</td><td>' + escapeHtml(c.country) + '</td><td>' + c.count + '</td></tr>';
-    }).join('') + '</tbody></table>';
+   var countryHtml = '<h3>Visitors by country</h3><table><thead><tr><th>Site</th><th>Country</th><th>City</th><th>Count</th></tr></thead><tbody>' + countries.map(function (c) {
+  return '<tr><td>' + escapeHtml(c.site) + '</td><td>' + escapeHtml(c.country) + '</td><td>' + escapeHtml(c.city) + '</td><td>' + c.count + '</td></tr>';
+}).join('') + '</tbody></table>';
             countriesEl.innerHTML = countryHtml;
           }
         }
