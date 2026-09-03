@@ -6,141 +6,375 @@
 <title>Demo Engagement Dashboard</title>
 <style>
   :root {
-    --ink: #1a1a1a;
-    --ink-soft: #666;
-    --line: #e5e5e5;
-    --paper: #fafafa;
-    --card: #fff;
+    --bg: #0b0d12;
+    --panel: #12151c;
+    --panel-2: #161a23;
+    --line: #232833;
+    --text: #e8eaed;
+    --text-soft: #9aa1ac;
+    --accent: #7c8cff;
+    --accent-soft: rgba(124,140,255,.12);
+    --good: #34d399;
+    --amber: #fbbf24;
+    --violet: #c084fc;
+    --radius: 12px;
   }
   * { box-sizing: border-box; }
   body {
     margin: 0;
     padding: 32px;
-    background: var(--paper);
-    color: var(--ink);
+    background: var(--bg);
+    color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
-  h1 { font-size: 20px; margin: 0 0 4px; }
-  .sub { color: var(--ink-soft); font-size: 13px; margin-bottom: 24px; }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    background: var(--card);
+  h1 { font-size: 22px; margin: 0 0 4px; font-weight: 650; letter-spacing: -.01em; }
+  .sub { color: var(--text-soft); font-size: 13px; margin-bottom: 24px; }
+  .toolbar { display: flex; gap: 8px; margin-bottom: 28px; align-items: center; flex-wrap: wrap; }
+  input[type=password], input[type=text] {
+    padding: 9px 12px;
     border: 1px solid var(--line);
     border-radius: 8px;
-    overflow: hidden;
-  }
-  th, td {
-    text-align: left;
-    padding: 10px 14px;
-    border-bottom: 1px solid var(--line);
-    font-size: 14px;
-  }
-  th {
-    background: #f3f3f3;
-    font-weight: 600;
-    color: var(--ink-soft);
-    text-transform: uppercase;
-    font-size: 11px;
-    letter-spacing: 0.04em;
-  }
-  tr:last-child td { border-bottom: none; }
-  .empty { padding: 40px; text-align: center; color: var(--ink-soft); }
-  .err { color: #b91c1c; padding: 16px; }
-  input#key {
-    padding: 8px 10px;
-    border: 1px solid var(--line);
-    border-radius: 6px;
     font-size: 13px;
-    width: 220px;
+    background: var(--panel);
+    color: var(--text);
+    outline: none;
   }
+  input[type=password]:focus, input[type=text]:focus { border-color: var(--accent); }
+  input#key { width: 220px; }
   button {
-    padding: 8px 14px;
+    padding: 9px 16px;
     border: none;
-    border-radius: 6px;
-    background: #111;
-    color: #fff;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #0b0d12;
     font-size: 13px;
+    font-weight: 600;
     cursor: pointer;
   }
-  .toolbar { display: flex; gap: 8px; margin-bottom: 20px; align-items: center; }
+  button:hover { opacity: .9; }
+  button.ghost {
+    background: transparent;
+    color: var(--text-soft);
+    border: 1px solid var(--line);
+    font-weight: 500;
+  }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 28px; }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+  }
+  .card .label { font-size: 11px; color: var(--text-soft); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+  .card .value { font-size: 26px; font-weight: 650; letter-spacing: -.01em; }
+  .card .value.small { font-size: 16px; font-weight: 600; }
+  section { margin-bottom: 32px; }
+  section h2 { font-size: 14px; font-weight: 650; margin: 0 0 12px; color: var(--text); }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .panel-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel-2);
+  }
+  table { width: 100%; border-collapse: collapse; }
+  th, td {
+    text-align: left;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--line);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  th {
+    background: var(--panel-2);
+    font-weight: 600;
+    color: var(--text-soft);
+    text-transform: uppercase;
+    font-size: 10.5px;
+    letter-spacing: .04em;
+    cursor: pointer;
+    user-select: none;
+    position: sticky;
+    top: 0;
+  }
+  th:hover { color: var(--text); }
+  th .arrow { margin-left: 4px; opacity: .6; font-size: 10px; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,.02); }
+  .empty { padding: 40px; text-align: center; color: var(--text-soft); font-size: 13px; }
+  .err { color: #f87171; padding: 16px; font-size: 13px; }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge.view { background: rgba(154,161,172,.15); color: var(--text-soft); }
+  .badge.engaged_30s { background: var(--accent-soft); color: var(--accent); }
+  .badge.engaged_2min { background: rgba(192,132,252,.15); color: var(--violet); }
+  .badge.engaged_5min { background: rgba(52,211,153,.15); color: var(--good); }
+  .badge.opened_note { background: rgba(251,191,36,.15); color: var(--amber); }
+  .badge.other { background: rgba(154,161,172,.15); color: var(--text-soft); }
+  .bar-wrap { display: flex; align-items: center; gap: 8px; min-width: 140px; }
+  .bar-track { flex: 1; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; min-width: 60px; }
+  .bar-fill { height: 100%; background: var(--accent); border-radius: 3px; }
+  .num { font-variant-numeric: tabular-nums; }
+  .table-scroll { overflow-x: auto; }
+  .filter-row { padding: 10px 16px; border-bottom: 1px solid var(--line); }
+  .filter-row input { width: 220px; }
+  @media (max-width: 700px) {
+    body { padding: 16px; }
+    input#key { width: 140px; }
+  }
 </style>
 </head>
 <body>
   <h1>Demo Engagement Dashboard</h1>
-  <div class="sub">Per-site event counts, sorted by site then event.</div>
+  <div class="sub">Live visitor activity across all tracked sites.</div>
 
   <div class="toolbar">
     <input id="key" type="password" placeholder="Dashboard secret" />
     <button onclick="load()">Load</button>
+    <button class="ghost" onclick="load()">↻ Refresh</button>
   </div>
 
   <div id="content"></div>
-  <div id="countries"></div>
 
   <script>
-    // Pre-fill the key from the URL (?key=...) if present, and remember it locally
-    const params = new URLSearchParams(location.search);
-    const stored = params.get('key') || sessionStorage.getItem('dash_key') || '';
+    var STATE = { rows: [], countries: [], sites: [] };
+    var SORT = {
+      sites: { key: 'lastSeen', dir: 'desc' },
+      rows: { key: 'site', dir: 'asc' },
+      countries: { key: 'count', dir: 'desc' },
+    };
+    var FILTER = { rows: '', countries: '' };
+
+    var params = new URLSearchParams(location.search);
+    var stored = params.get('key') || sessionStorage.getItem('dash_key') || '';
     document.getElementById('key').value = stored;
     if (stored) load();
 
     async function load() {
-      const key = document.getElementById('key').value.trim();
+      var key = document.getElementById('key').value.trim();
       sessionStorage.setItem('dash_key', key);
-      const content = document.getElementById('content');
+      var content = document.getElementById('content');
       content.innerHTML = '<div class="empty">Loading…</div>';
       try {
-        const res = await fetch(`/api/stats?key=${encodeURIComponent(key)}`);
+        var res = await fetch('/api/stats?key=' + encodeURIComponent(key));
         if (!res.ok) {
-          content.innerHTML = `<div class="err">Error ${res.status}: check your secret key.</div>`;
+          var msg = res.status === 401 ? 'check your secret key.' : ('server returned ' + res.status + '.');
+          content.innerHTML = '<div class="err">Error ' + res.status + ': ' + msg + '</div>';
           return;
         }
-              const { rows, countries } = await res.json();
-        if (!rows || rows.length === 0) {
-          content.innerHTML = '<div class="empty">No events recorded yet.</div>';
-          return;
-        }
-        const html = `
-          <table>
-            <thead>
-              <tr><th>Site</th><th>Event</th><th>Count</th><th>Last seen</th></tr>
-            </thead>
-            <tbody>
-              ${rows.map(r => `
-                <tr>
-                  <td>${escapeHtml(r.site)}</td>
-                  <td>${escapeHtml(r.event_name)}</td>
-                  <td>${r.count}</td>
-                  <td>${new Date(r.last_seen).toLocaleString()}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        `;
-        content.innerHTML = html;
-
-        var countriesEl = document.getElementById('countries');
-        if (countriesEl) {
-          if (!countries || countries.length === 0) {
-            countriesEl.innerHTML = '';
-          } else {
-   var countryHtml = '<h3>Visitors by country</h3><table><thead><tr><th>Site</th><th>Country</th><th>City</th><th>Count</th></tr></thead><tbody>' + countries.map(function (c) {
-  return '<tr><td>' + escapeHtml(c.site) + '</td><td>' + escapeHtml(c.country) + '</td><td>' + escapeHtml(c.city) + '</td><td>' + c.count + '</td></tr>';
-}).join('') + '</tbody></table>';
-            countriesEl.innerHTML = countryHtml;
-          }
-        }
-        
+        var data = await res.json();
+        STATE.rows = data.rows || [];
+        STATE.countries = data.countries || [];
+        STATE.sites = data.sites || [];
+        render();
       } catch (e) {
-        content.innerHTML = `<div class="err">Request failed: ${escapeHtml(String(e))}</div>`;
+        content.innerHTML = '<div class="err">Request failed: ' + escapeHtml(String(e)) + '</div>';
       }
     }
 
+    function render() {
+      var content = document.getElementById('content');
+      if (!STATE.sites.length) {
+        content.innerHTML = '<div class="empty">No events recorded yet.</div>';
+        return;
+      }
+      content.innerHTML =
+        renderCards() +
+        renderSitesSection() +
+        renderEventsSection() +
+        renderCountriesSection();
+      wireSorters();
+      wireFilters();
+    }
+
+    function renderCards() {
+      var totalVisitors = STATE.sites.reduce(function (a, s) { return a + s.visitors; }, 0);
+      var totalNotes = STATE.sites.reduce(function (a, s) { return a + s.opened_note; }, 0);
+      var siteCount = STATE.sites.length;
+      var top = STATE.sites.slice().sort(function (a, b) { return b.visitors - a.visitors; })[0];
+      return '' +
+        '<div class="cards">' +
+          card('Total visitors', totalVisitors) +
+          card('Sites tracked', siteCount) +
+          card('Notes opened', totalNotes) +
+          card('Top site', top ? escapeHtml(top.site) : '—', true) +
+        '</div>';
+    }
+
+    function card(label, value, small) {
+      return '<div class="card"><div class="label">' + escapeHtml(label) + '</div>' +
+        '<div class="value' + (small ? ' small' : '') + '">' + value + '</div></div>';
+    }
+
+    function renderSitesSection() {
+      var rows = applySort(STATE.sites.slice(), SORT.sites);
+      var maxVisitors = Math.max.apply(null, rows.map(function (r) { return r.visitors; }).concat([1]));
+      var body = rows.map(function (s) {
+        return '<tr>' +
+          '<td>' + escapeHtml(s.site) + '</td>' +
+          '<td>' + barCell(s.visitors, maxVisitors) + '</td>' +
+          '<td class="num">' + s.view + '</td>' +
+          '<td class="num">' + s.engaged_30s + '</td>' +
+          '<td class="num">' + s.engaged_2min + '</td>' +
+          '<td class="num">' + s.engaged_5min + '</td>' +
+          '<td class="num">' + s.opened_note + '</td>' +
+          '<td>' + timeAgo(s.lastSeen) + '</td>' +
+          '</tr>';
+      }).join('');
+      return section('Per-site summary', '' +
+        '<div class="table-scroll"><table>' +
+        thead('sites', [
+          ['site', 'Site'], ['visitors', 'Visitors'], ['view', 'Viewed'],
+          ['engaged_30s', '30s'], ['engaged_2min', '2min'], ['engaged_5min', '5min'],
+          ['opened_note', 'Note'], ['lastSeen', 'Last seen'],
+        ]) +
+        '<tbody>' + body + '</tbody>' +
+        '</table></div>');
+    }
+
+    function renderEventsSection() {
+      var rows = STATE.rows.filter(function (r) {
+        return !FILTER.rows || r.site.toLowerCase().indexOf(FILTER.rows) !== -1;
+      });
+      rows = applySort(rows.slice(), SORT.rows);
+      var body = rows.map(function (r) {
+        return '<tr>' +
+          '<td>' + escapeHtml(r.site) + '</td>' +
+          '<td><span class="badge ' + escapeHtml(r.event_name) + '">' + escapeHtml(r.event_name) + '</span></td>' +
+          '<td class="num">' + r.count + '</td>' +
+          '<td>' + timeAgo(r.last_seen) + '</td>' +
+          '</tr>';
+      }).join('');
+      return section('All events', '' +
+        '<div class="filter-row"><input id="filter-rows" type="text" placeholder="Filter by site…" value="' + escapeHtml(FILTER.rows) + '" /></div>' +
+        '<div class="table-scroll"><table>' +
+        thead('rows', [['site', 'Site'], ['event_name', 'Event'], ['count', 'Count'], ['last_seen', 'Last seen']]) +
+        '<tbody>' + (body || '<tr><td colspan="4" class="empty">No matches.</td></tr>') + '</tbody>' +
+        '</table></div>');
+    }
+
+    function renderCountriesSection() {
+      var rows = STATE.countries.filter(function (r) {
+        return !FILTER.countries || r.site.toLowerCase().indexOf(FILTER.countries) !== -1 ||
+          r.country.toLowerCase().indexOf(FILTER.countries) !== -1 || (r.city || '').toLowerCase().indexOf(FILTER.countries) !== -1;
+      });
+      rows = applySort(rows.slice(), SORT.countries);
+      var body = rows.map(function (r) {
+        return '<tr>' +
+          '<td>' + escapeHtml(r.site) + '</td>' +
+          '<td>' + escapeHtml(r.country) + '</td>' +
+          '<td>' + escapeHtml(r.city || '—') + '</td>' +
+          '<td class="num">' + r.count + '</td>' +
+          '</tr>';
+      }).join('');
+      return section('Visitors by location', '' +
+        '<div class="filter-row"><input id="filter-countries" type="text" placeholder="Filter by site, country, or city…" value="' + escapeHtml(FILTER.countries) + '" /></div>' +
+        '<div class="table-scroll"><table>' +
+        thead('countries', [['site', 'Site'], ['country', 'Country'], ['city', 'City'], ['count', 'Count']]) +
+        '<tbody>' + (body || '<tr><td colspan="4" class="empty">No matches.</td></tr>') + '</tbody>' +
+        '</table></div>');
+    }
+
+    function section(title, inner) {
+      return '<section><h2>' + escapeHtml(title) + '</h2><div class="panel">' + inner + '</div></section>';
+    }
+
+    function thead(tableName, cols) {
+      var sort = SORT[tableName];
+      var cells = cols.map(function (c) {
+        var key = c[0], label = c[1];
+        var arrow = sort.key === key ? (sort.dir === 'asc' ? '▲' : '▼') : '';
+        return '<th data-table="' + tableName + '" data-key="' + key + '">' + escapeHtml(label) +
+          (arrow ? '<span class="arrow">' + arrow + '</span>' : '') + '</th>';
+      }).join('');
+      return '<thead><tr>' + cells + '</tr></thead>';
+    }
+
+    function barCell(value, max) {
+      var pct = max > 0 ? Math.round((value / max) * 100) : 0;
+      return '<div class="bar-wrap"><span class="num">' + value + '</span>' +
+        '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div></div>';
+    }
+
+    function applySort(arr, sort) {
+      arr.sort(function (a, b) {
+        var av = a[sort.key], bv = b[sort.key];
+        if (sort.key === 'lastSeen' || sort.key === 'last_seen') {
+          av = new Date(av).getTime(); bv = new Date(bv).getTime();
+        } else if (typeof av === 'string') {
+          av = av.toLowerCase(); bv = bv.toLowerCase();
+        }
+        if (av < bv) return sort.dir === 'asc' ? -1 : 1;
+        if (av > bv) return sort.dir === 'asc' ? 1 : -1;
+        return 0;
+      });
+      return arr;
+    }
+
+    function wireSorters() {
+      var ths = document.querySelectorAll('th[data-table]');
+      ths.forEach(function (th) {
+        th.addEventListener('click', function () {
+          var table = th.getAttribute('data-table');
+          var key = th.getAttribute('data-key');
+          var sort = SORT[table];
+          if (sort.key === key) {
+            sort.dir = sort.dir === 'asc' ? 'desc' : 'asc';
+          } else {
+            sort.key = key;
+            sort.dir = 'asc';
+          }
+          render();
+        });
+      });
+    }
+
+    function wireFilters() {
+      var fr = document.getElementById('filter-rows');
+      if (fr) {
+        fr.addEventListener('input', function () { FILTER.rows = fr.value.toLowerCase(); render(); preserveFocus('filter-rows'); });
+      }
+      var fc = document.getElementById('filter-countries');
+      if (fc) {
+        fc.addEventListener('input', function () { FILTER.countries = fc.value.toLowerCase(); render(); preserveFocus('filter-countries'); });
+      }
+    }
+
+    function preserveFocus(id) {
+      var el = document.getElementById(id);
+      if (el) { el.focus(); var v = el.value; el.value = ''; el.value = v; }
+    }
+
+    function timeAgo(iso) {
+      var d = new Date(iso);
+      var diffMs = Date.now() - d.getTime();
+      var mins = Math.round(diffMs / 60000);
+      if (mins < 1) return 'just now';
+      if (mins < 60) return mins + 'm ago';
+      var hrs = Math.round(mins / 60);
+      if (hrs < 24) return hrs + 'h ago';
+      var days = Math.round(hrs / 24);
+      if (days < 30) return days + 'd ago';
+      return d.toLocaleDateString();
+    }
+
     function escapeHtml(s) {
-      return String(s).replace(/[&<>"']/g, c => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-      }[c]));
+      return String(s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
     }
   </script>
 </body>
