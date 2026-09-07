@@ -226,7 +226,8 @@
       var rows = STATE.events.filter(function (r) {
         return !FILTER.events || r.site.toLowerCase().indexOf(FILTER.events) !== -1 ||
           r.event.toLowerCase().indexOf(FILTER.events) !== -1 ||
-          r.country.toLowerCase().indexOf(FILTER.events) !== -1;
+          r.country.toLowerCase().indexOf(FILTER.events) !== -1 ||
+          r.city.toLowerCase().indexOf(FILTER.events) !== -1;
       });
       rows = applySort(rows.slice(), SORT.events);
       var body = rows.map(function (r) {
@@ -234,14 +235,15 @@
           '<td>' + escapeHtml(r.site) + '</td>' +
           '<td><span class="badge ' + escapeHtml(r.event) + '">' + escapeHtml(r.event) + '</span></td>' +
           '<td>' + escapeHtml(r.country) + '</td>' +
+          '<td>' + escapeHtml(r.city) + '</td>' +
           '<td>' + timeAgo(r.date) + '</td>' +
           '</tr>';
       }).join('');
       return section('Activity log', '' +
-        '<div class="filter-row"><input id="filter-events" type="text" placeholder="Filter by site, event, or country…" value="' + escapeHtml(FILTER.events) + '" /></div>' +
+        '<div class="filter-row"><input id="filter-events" type="text" placeholder="Filter by site, event, country, or city…" value="' + escapeHtml(FILTER.events) + '" /></div>' +
         '<div class="table-scroll"><table>' +
-        thead('events', [['site', 'Site'], ['event', 'Event'], ['country', 'Country'], ['date', 'Date']]) +
-        '<tbody>' + (body || '<tr><td colspan="4" class="empty">No matches.</td></tr>') + '</tbody>' +
+        thead('events', [['site', 'Site'], ['event', 'Event'], ['country', 'Country'], ['city', 'City'], ['date', 'Date']]) +
+        '<tbody>' + (body || '<tr><td colspan="5" class="empty">No matches.</td></tr>') + '</tbody>' +
         '</table></div>');
     }
 

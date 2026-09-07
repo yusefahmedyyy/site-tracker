@@ -107,12 +107,13 @@ export default async function handler(req, res) {
       return new Date(b.lastSeen) - new Date(a.lastSeen);
     });
 
-    // Raw activity log: one row per event, for a simple site / event / country / date view.
+    // Raw activity log: one row per event, for a simple site / event / country / city / date view.
     var events = data.map(function (row) {
       return {
         site: row.site,
         event: row.event_name,
         country: row.country || 'Unknown',
+        city: row.city || 'Unknown',
         date: row.created_at,
       };
     });
