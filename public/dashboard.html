@@ -150,13 +150,14 @@
   <div id="content"></div>
 
   <script>
-    var STATE = { rows: [], countries: [], sites: [] };
+    var STATE = { rows: [], countries: [], sites: [], events: [] };
     var SORT = {
       sites: { key: 'lastSeen', dir: 'desc' },
       rows: { key: 'site', dir: 'asc' },
       countries: { key: 'count', dir: 'desc' },
+      events: { key: 'date', dir: 'desc' },
     };
-    var FILTER = { rows: '', countries: '' };
+    var FILTER = { rows: '', countries: '', events: '' };
 
     var params = new URLSearchParams(location.search);
     var stored = params.get('key') || sessionStorage.getItem('dash_key') || '';
@@ -179,6 +180,7 @@
         STATE.rows = data.rows || [];
         STATE.countries = data.countries || [];
         STATE.sites = data.sites || [];
+        STATE.events = data.events || [];
         render();
       } catch (e) {
         content.innerHTML = '<div class="err">Request failed: ' + escapeHtml(String(e)) + '</div>';
@@ -193,6 +195,7 @@
       }
       content.innerHTML =
         renderCards() +
+        renderActivitySection() +
         renderSitesSection() +
         renderEventsSection() +
         renderCountriesSection();
@@ -217,6 +220,29 @@
     function card(label, value, small) {
       return '<div class="card"><div class="label">' + escapeHtml(label) + '</div>' +
         '<div class="value' + (small ? ' small' : '') + '">' + value + '</div></div>';
+    }
+
+    function renderActivitySection() {
+      var rows = STATE.events.filter(function (r) {
+        return !FILTER.events || r.site.toLowerCase().indexOf(FILTER.events) !== -1 ||
+          r.event.toLowerCase().indexOf(FILTER.events) !== -1 ||
+          r.country.toLowerCase().indexOf(FILTER.events) !== -1;
+      });
+      rows = applySort(rows.slice(), SORT.events);
+      var body = rows.map(function (r) {
+        return '<tr>' +
+          '<td>' + escapeHtml(r.site) + '</td>' +
+          '<td><span class="badge ' + escapeHtml(r.event) + '">' + escapeHtml(r.event) + '</span></td>' +
+          '<td>' + escapeHtml(r.country) + '</td>' +
+          '<td>' + timeAgo(r.date) + '</td>' +
+          '</tr>';
+      }).join('');
+      return section('Activity log', '' +
+        '<div class="filter-row"><input id="filter-events" type="text" placeholder="Filter by site, event, or country…" value="' + escapeHtml(FILTER.events) + '" /></div>' +
+        '<div class="table-scroll"><table>' +
+        thead('events', [['site', 'Site'], ['event', 'Event'], ['country', 'Country'], ['date', 'Date']]) +
+        '<tbody>' + (body || '<tr><td colspan="4" class="empty">No matches.</td></tr>') + '</tbody>' +
+        '</table></div>');
     }
 
     function renderSitesSection() {
@@ -312,7 +338,7 @@
     function applySort(arr, sort) {
       arr.sort(function (a, b) {
         var av = a[sort.key], bv = b[sort.key];
-        if (sort.key === 'lastSeen' || sort.key === 'last_seen') {
+        if (sort.key === 'lastSeen' || sort.key === 'last_seen' || sort.key === 'date') {
           av = new Date(av).getTime(); bv = new Date(bv).getTime();
         } else if (typeof av === 'string') {
           av = av.toLowerCase(); bv = bv.toLowerCase();
@@ -350,6 +376,10 @@
       var fc = document.getElementById('filter-countries');
       if (fc) {
         fc.addEventListener('input', function () { FILTER.countries = fc.value.toLowerCase(); render(); preserveFocus('filter-countries'); });
+      }
+      var fe = document.getElementById('filter-events');
+      if (fe) {
+        fe.addEventListener('input', function () { FILTER.events = fe.value.toLowerCase(); render(); preserveFocus('filter-events'); });
       }
     }
 

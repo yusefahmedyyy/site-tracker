@@ -107,7 +107,17 @@ export default async function handler(req, res) {
       return new Date(b.lastSeen) - new Date(a.lastSeen);
     });
 
-    return res.status(200).json({ rows: rows, countries: countries, sites: sites });
+    // Raw activity log: one row per event, for a simple site / event / country / date view.
+    var events = data.map(function (row) {
+      return {
+        site: row.site,
+        event: row.event_name,
+        country: row.country || 'Unknown',
+        date: row.created_at,
+      };
+    });
+
+    return res.status(200).json({ rows: rows, countries: countries, sites: sites, events: events });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: 'Unexpected error' });
